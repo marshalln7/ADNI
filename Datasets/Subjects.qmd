@@ -1,0 +1,51 @@
+---
+title: "Subjects"
+format: html
+editor: source
+---
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+csv_files <- list.files(pattern = "\\.csv$") # Getting a list of each .csv file in the folder. 
+
+data <- NULL # Creating an empty item called data
+
+all_data <- NULL # Creating an empty item called all_data
+
+# Loop through each .csv file and read it into a data frame
+for (file in csv_files) {
+  file_path <- file.path(getwd(), file)  # Get full file path
+  data <- read.csv(file_path)  #Reading in the data to the object data
+    
+   subjects <- data |>    # Creating a vector called subjects
+     distinct(RID) |> arrange(RID) |> # Getting the unique values for RID and putting them in order
+     pull(RID) # Taking the RID variable and turning it into the vector
+   
+  all_data <- as.data.frame(rbind(subjects, all_data)) # combining the subjects vector with the rest of the data.
+
+}
+
+#Changing the row names to match the names of each data file
+rownames(all_data) <- rev(csv_files) # Using rev because the order the files end up in is reversed from the csv_files vector
+
+# Transposing the data so that each column contains all the RIDs for the file it represents
+all_data <- as.data.frame(t(all_data))
+
+# Getting rid of duplicate RID numbers in each column so we only have one value for each RID. 
+for (i in csv_files) {
+  all_data[,i][duplicated(all_data[, i])] <- NA
+}
+
+
+# Exporting the file as an excel file so the .csv pattern doesn't get tainted. 
+
+library(openxlsx)
+
+write.xlsx(all_data, file = "RID_by_file.xlsx")
+
+```
+

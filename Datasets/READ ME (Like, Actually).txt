@@ -1,0 +1,13 @@
+This is a folder for handling your very favorite datasets!
+
+If you want to add a dataset to the environment, simply drop it into the "Raw Data Files" folder so that our scripts can do the rest. Make sure that you change the name of it to the code for the table (the capitalized set of letters in the filename when you download it from the ADNI website) followed by a dash and then the name of the dataset listed on the ADNI website (these ones: https://adni.loni.usc.edu/data-samples/adni-data-inventory/). This is important because it enables our scripts to keep track of the different variables on the different tables while maintaining file names that are readable and accessible.
+
+Example: BIOMARK - Biomarker Samples [ADNI1,GO,2,3,4]
+
+When the Definition Adder script is run, it will create a copy of each of the raw datasets in the "Nice Data Files" folder that is meant to be read and analyzed without having to refer to the data dictionaries. There may still be important information about how the data was taken on the ADNI website that could be critical to understanding what's going on, but this is meant to give you an easy way to browse through and figure out what you're looking at.
+
+If the dataset that you want to import has its own dictionary and methods documentation that exists apart from the official ADNI data dictionary, please put it in its own folder in the Datasets folder so we can decide what to do with it later!
+
+When running analyses, it's probably still best to work with the raw data. If you do choose to use the nice data be aware of the multi-indexed column names as well as the entries that say "Not There" and "Not Taken" that are represented by -1 and -4 (sometimes a number sometimes a string) in the raw data, respectively. There will also be NaN values to consider in both the raw and the nice files. If you end up using a variable that becomes critically important to our project, be sure to double check the entry for it in the official data dictionary, in 98 of the 28900 variables the  protocols are changed between cohorts (in GENETIC, MMSE, PDXCONV, and PTHOME) so watch out for those. I might control for those later.
+
+Reach out to Marshall at msn39@byu.edu if you have any suggestions on how to make this better!
