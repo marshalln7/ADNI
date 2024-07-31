@@ -4,8 +4,8 @@ Created on Wed May 29 16:28:09 2024
 
 @author: Marshall
 
-This is a file that will generate a merged version of all of the timeless variables currently selected
-in the Timeless Variables spreadsheet
+This is a file that will generate a merged version of all of the profile variables currently selected
+in the Profile Variables spreadsheet
 """
 
 import pandas as pd
@@ -19,9 +19,10 @@ import datetime
 working_directory = os.getcwd()
 raw_files_list = os.listdir(working_directory + "\\Raw Data Files")
 
-#creates a dictionary of all of the timeless variables to merge where the tables are keys and the values are lists of variables
-timeless_variables = pd.read_excel("Timeless Variables.xlsx")
-variables_to_merge = timeless_variables.groupby('Table')['Variable'].apply(list).to_dict()
+#creates a dictionary of all of the profile variables to merge where the tables are keys and the values are lists of variables
+profile_variables = pd.read_excel("Timeless Variables.xlsx")
+variables_to_merge = profile_variables.groupby('Table')['Variable'].apply(list).to_dict()
+variable_types = profile_variables[["Variable", "Type"]].set_index("Variable")
 
 #keeps track of the variables that we have different entries for
 culpraits = []
@@ -82,11 +83,17 @@ for table in variables_to_merge.keys():
     id = "RID"
     variables = variables_to_merge[table]
     variables.append(id)
-    #apply missing data protocols and get rid of irrelevant duplicates
+    #apply missing data protocols and get rid of duplicates
     apply_missing_data_protocols(table_df)
     table_df.drop_duplicates(subset=variables, inplace=True)
     #get just the needed variables from the table
     needed_df = table_df[variables]
+    #makes the numeric columns numeric
+    variables.remove("RID")
+    for variable in variables:
+        if variable_types.at[variable, "Type"] == "Numerical":
+            needed_df[variable] = pd.to_numeric(needed_df[variable])
+        # add more here for categorical and ordinal data later DON'T FORGET!!!!!
     #merges, and adds suffixes to the new merged variable names, but only if they are from different tables
     suffix = "_" + table
     merged_dataframe = merged_dataframe.merge(needed_df, on=id, how="left", suffixes=(None, suffix))
@@ -150,7 +157,7 @@ file_path = "Merged Data Files\\" + new_filename
 # Use ExcelWriter to write the merged data on the fist sheet and the variable catalog on the second
 with pd.ExcelWriter(file_path) as writer:
     aggregated_dataframe.to_excel(writer, sheet_name='Timeless Variables', na_rep= "NaN")
-    timeless_variables.to_excel(writer, sheet_name='Variable Catalog', index=False)
+    profile_variables.to_excel(writer, sheet_name='Variable Catalog', index=False)
 
 os.startfile(file_path)
 

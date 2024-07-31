@@ -64,6 +64,10 @@ def ADAS_table():
 for table in variables_to_merge.keys():
     if table == "ADAS": #handling the weirdness of the ADAS tables
         table_df = ADAS_table()
+    elif table == "UPENNBIOMK_MASTER":
+        file_name = find_string_starting_with(raw_files_list, table)
+        table_df = pd.read_csv(working_directory + "\\Raw Data Files\\" + file_name)
+        table_df = table_df[table_df["BATCH"] == "MEDIAN"]
     else:
         file_name = find_string_starting_with(raw_files_list, table)
         table_df = pd.read_csv(working_directory + "\\Raw Data Files\\" + file_name)
