@@ -20,7 +20,7 @@ working_directory = os.getcwd()
 raw_files_list = os.listdir(working_directory + "\\Raw Data Files")
 
 #creates a dictionary of all of the profile variables to merge where the tables are keys and the values are lists of variables
-profile_variables = pd.read_excel("Timeless Variables.xlsx")
+profile_variables = pd.read_excel("Profile Variables.xlsx")
 variables_to_merge = profile_variables.groupby('Table')['Variable'].apply(list).to_dict()
 variable_types = profile_variables[["Variable", "Type"]].set_index("Variable")
 
@@ -151,12 +151,12 @@ long_variables_string = '_'.join(joined_dict_entries)
 #export the new merged file to the Marged Data Files folder
 now = datetime.datetime.now()
 date_string = now.strftime("%Y-%m-%d")
-new_filename = "Timeless Variables " + date_string + ".xlsx"
+new_filename = "Profile Variables " + date_string + ".xlsx"
 file_path = "Merged Data Files\\" + new_filename
 
 # Use ExcelWriter to write the merged data on the fist sheet and the variable catalog on the second
 with pd.ExcelWriter(file_path) as writer:
-    aggregated_dataframe.to_excel(writer, sheet_name='Timeless Variables', na_rep= "NaN")
+    aggregated_dataframe.to_excel(writer, sheet_name='Profile Variables', na_rep= "NaN")
     profile_variables.to_excel(writer, sheet_name='Variable Catalog', index=False)
 
 os.startfile(file_path)
