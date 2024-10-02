@@ -2,7 +2,7 @@ This is a folder for handling your very favorite datasets!
 
 If you want to add a dataset to the environment, simply drop it into the "Raw Data Files" folder so that our scripts can do the rest. Make sure that you change the name of it to the code for the table (the capitalized set of letters in the filename when you download it from the ADNI website) followed by a dash and then the name of the dataset listed on the ADNI website (these ones: https://adni.loni.usc.edu/data-samples/adni-data-inventory/). This is important because it enables our scripts to keep track of the different variables on the different tables while maintaining file names that are readable and accessible.
 
-Example: BIOMARK - Biomarker Samples [ADNI1,GO,2,3,4]
+Example: BIOMARK - Biomarker Samples [ADNI1,GO,2,3,4].csv
 
 When the Definition Adder script is run, it will create a copy of each of the raw datasets in the "Nice Data Files" folder that is meant to be read and analyzed without having to refer to the data dictionaries. There may still be important information about how the data was taken on the ADNI website that could be critical to understanding what's going on, but this is meant to give you an easy way to browse through and figure out what you're looking at.
 

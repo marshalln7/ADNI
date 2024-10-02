@@ -10,7 +10,7 @@ import os
 
 working_directory = os.getcwd()
 raw_files_list = os.listdir(working_directory + "\\Raw Data Files")
-nice_files_list = os.listdir(working_directory + "\\Nice Data Files")
+nice_files_list = os.listdir(working_directory + "\\Labeled Data Files")
 
 def clean_file(file):
     file_to_modify = "Raw Data Files/" + file
@@ -105,13 +105,16 @@ def clean_file(file):
     target_dataset = target_dataset.replace("-4", "Not Taken")
     target_dataset = target_dataset.replace("-1", "Not There")
     
-    target_dataset.to_csv("Nice Data Files/" + file, na_rep='NaN')
+    target_dataset.to_csv("Labeled Data Files/" + file, na_rep='NaN')
 
-def clean_them_all():
+def clean_raw_files():
     #makes a list of the files that haven't been cleaned already
     uncleaned_files = [file for file in raw_files_list if file not in nice_files_list]
     for file in uncleaned_files:
         clean_file(file)
+        
+if __name__ == "__main__":
+    clean_raw_files()
     
     
     
