@@ -8,7 +8,6 @@ This script creates and manages the ADNI Dashboard interface. All merging, valid
 are handled externally and imported as seen below. The ultimate goal here is to create a class that an 
 optimization algorithm can then use to create the optimum model
 """
-# it's different
 
 
 import importlib
@@ -36,8 +35,8 @@ importlib.reload(Progression_Variable_Merger)
 importlib.reload(Dataset_Validator)
 
 #from MASH import MASH
-from SPUD import SPUD
-import Triangular #used to reconstruct the triangular distance matricies that SPUD creates, see run_manifold()
+from mashspud import SPUD #used to reconstruct the triangular distance matricies that SPUD creates, see run_manifold()
+from mashspud import triangular_helper as Triangular
 
 
 class ADNI_Dashboard:
@@ -238,6 +237,10 @@ class ADNI_Dashboard:
         print(df)
         return df
     
+    def validate_domain(self):
+        df = self.get_specified_dataframe().fillna(-4).set_index
+        
+    
     def create_distance_matrix(self):
         filename = self.dropdowns["merged_files"][1].get()
         df = self.get_specified_dataframe()
@@ -401,7 +404,7 @@ class ADNI_Dashboard:
         self.create_dropdown(frame, "label", labels, "DX_bl", column=3, row=2)
         
         #validate domains button
-        self.create_button(frame, "validate_domain", "Validate Domain", column = 3, row = 3, command=self.add_labels)
+        self.create_button(frame, "validate_domain", "Validate Domain", column = 3, row = 3, command=self.validate_domain)
         
         #put the distance metric dropdown menu on the page
         distance_metrics = list(_METRICS.keys())
