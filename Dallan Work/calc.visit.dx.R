@@ -47,13 +47,14 @@ calc.visit.dx <- function(visit.data, dx.data){
       USERDATE2 = ymd(USERDATE2),
       USERDATE = ymd(USERDATE),
       # Search for the first non-empty value among EXAMDATE, USERDATE2, and USERDATE
-      DXDATE = coalesce(EXAMDATE, USERDATE2, USERDATE), 
+      DXDATE = coalesce(EXAMDATE, USERDATE2, USERDATE),
     ) |>
     arrange(RID, DXDATE) |> # Sort by RID first, then by diagnosis date
     filter(!is.na(DXDATE)) |> # Check for NAs
     mutate(
       # baseline is first visit or m0
       bl = first(DXDATE), 
+      DIAGNOSIS = ifelse(DXDATE == bl, 0, DIAGNOSIS),
       # find difference compared to baseline and round to nearest 6 month interval
       month.diff = round(interval(bl, DXDATE) / months(1) / 6) * 6,
       # Create new viscode labels in the form of "mXX"
@@ -70,9 +71,10 @@ calc.visit.dx <- function(visit.data, dx.data){
     left_join(dx.data) |>
     # Create labels from Diagnoses
     mutate(
-      Dx_bl = ifelse(is.na(DIAGNOSIS), 0, DIAGNOSIS)
+      Dx_bl = DIAGNOSIS
     ) |>
-    select(RID, VISITDATE, Dx_bl, VISMONTH) |>
-    arrange(RID, VISITDATE)
+    arrange(RID, VISITDATE) |>
+    fill(Dx_bl, .direction = "down") |>
+    select(RID, VISITDATE, Dx_bl, VISMONTH)
   return(combined.data)
 }
