@@ -28,10 +28,11 @@ calc.visit.dx <- function(visit.data, dx.data){
       # find difference compared to baseline and round to nearest 6 month interval
       month.diff = round(interval(bl, VISITDATE) / months(1) / 6) * 6,
       # Create new viscode labels in the form of "mXX"
-      VISCODE = paste0("m", month.diff)
+      VISCODE = paste0("m", month.diff),
+      VISMONTH = month.diff
     ) |>
     ungroup() |>
-    select(RID, VISITDATE, VISCODE) |>
+    select(RID, VISITDATE, VISCODE, VISMONTH) |>
     arrange(RID, VISITDATE)
   
   
@@ -47,12 +48,6 @@ calc.visit.dx <- function(visit.data, dx.data){
       USERDATE = ymd(USERDATE),
       # Search for the first non-empty value among EXAMDATE, USERDATE2, and USERDATE
       DXDATE = coalesce(EXAMDATE, USERDATE2, USERDATE), 
-      # Create labels from Diagnoses
-      Label = case_when(
-        DIAGNOSIS == 1 ~ "CN",
-        DIAGNOSIS == 2 ~ "MCI",
-        DIAGNOSIS == 3 ~ "Dementia"
-      )
     ) |>
     arrange(RID, DXDATE) |> # Sort by RID first, then by diagnosis date
     filter(!is.na(DXDATE)) |> # Check for NAs
@@ -62,10 +57,10 @@ calc.visit.dx <- function(visit.data, dx.data){
       # find difference compared to baseline and round to nearest 6 month interval
       month.diff = round(interval(bl, DXDATE) / months(1) / 6) * 6,
       # Create new viscode labels in the form of "mXX"
-      VISCODE = paste0("m", month.diff)
+      VISCODE = paste0("m", month.diff),
     ) |>
     ungroup() |>
-    select(RID, DXDATE, VISCODE, DIAGNOSIS, Label) |>
+    select(RID, DXDATE, VISCODE, DIAGNOSIS) |>
     arrange(RID, DXDATE)
   
   
@@ -73,14 +68,11 @@ calc.visit.dx <- function(visit.data, dx.data){
   
   combined.data <- visit.data |> 
     left_join(dx.data) |>
-    group_by(RID, VISITDATE) |>
-    # mutate(
-    #   time_diff = abs(difftime(VISITDATE, DXDATE, units = "days"))
-    # ) |>
-    # filter(time_diff == min(time_diff)) |>
-    ungroup() |>
-    select(RID, VISITDATE, VISCODE, DIAGNOSIS, Label) |>
+    # Create labels from Diagnoses
+    mutate(
+      Dx_bl = ifelse(is.na(DIAGNOSIS), 0, DIAGNOSIS)
+    ) |>
+    select(RID, VISITDATE, Dx_bl, VISMONTH) |>
     arrange(RID, VISITDATE)
-  
   return(combined.data)
 }
