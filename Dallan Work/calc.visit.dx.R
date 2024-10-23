@@ -54,7 +54,6 @@ calc.visit.dx <- function(visit.data, dx.data){
     mutate(
       # baseline is first visit or m0
       bl = first(DXDATE), 
-      DIAGNOSIS = ifelse(DXDATE == bl, 0, DIAGNOSIS),
       # find difference compared to baseline and round to nearest 6 month interval
       month.diff = round(interval(bl, DXDATE) / months(1) / 6) * 6,
       # Create new viscode labels in the form of "mXX"
@@ -70,11 +69,14 @@ calc.visit.dx <- function(visit.data, dx.data){
   combined.data <- visit.data |> 
     left_join(dx.data) |>
     # Create labels from Diagnoses
+    group_by(RID) |>
     mutate(
-      Dx_bl = DIAGNOSIS
+      DX_bl = first(na.omit(DIAGNOSIS)),
+      DIAGNOSIS = zoo::na.locf(DIAGNOSIS, na.rm = FALSE)
     ) |>
     arrange(RID, VISITDATE) |>
-    fill(Dx_bl, .direction = "down") |>
-    select(RID, VISITDATE, Dx_bl, VISMONTH)
+    fill(DX_bl, .direction = "down") |>
+    select(RID, VISITDATE, DIAGNOSIS, DX_bl, VISMONTH) |>
+    distinct(VISITDATE, .keep_all = TRUE)
   return(combined.data)
 }
